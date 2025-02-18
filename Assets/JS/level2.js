@@ -169,7 +169,9 @@ function startTimer() {
 function updateUI() {
     const stats = getCurrentStats();
     document.getElementById('current-score').textContent = stats.scores[2];
-    document.getElementById('progress').textContent = `${currentStage}/3`;
+    if(currentStage <= 3 ) {
+        document.getElementById('progress').textContent = `${currentStage}/3`;
+    }
 }
 
 function finishLevel(timeout = false) {
