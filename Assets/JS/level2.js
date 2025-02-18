@@ -92,7 +92,7 @@ async function renderCars(cars) {
         card.className = 'relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105';
         
         const img = document.createElement('img');
-        img.className = 'w-full object-cover rounded-xl aspect-video';
+        img.className = 'w-full object-cover rounded-xl aspect-video opacity-80';
         img.src = car.element.src;
         img.alt = car.answer;
         
@@ -115,7 +115,7 @@ function handleCarClick(card, index) {
 
     const isCorrect = index === correctCarId;
     const stats = getCurrentStats();
-    const newScore = Math.max(stats.scores[2] + (isCorrect ? 15 : -7), 0);
+    const newScore = Math.max(stats.scores[2] + (isCorrect ? 15 : -10), 0);
     updateLevelStats(newScore - stats.scores[2], 2);
 
     showFeedback(card, isCorrect);
