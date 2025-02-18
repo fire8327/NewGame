@@ -1,4 +1,5 @@
-/* Логика первого уровня */
+import { getCurrentStats, updateLevelStats, completeLevel, updateRating } from './stats.js';
+
 const carBrands = [
     { image: 'audi.jpg', answer: 'audi' },
     { image: 'bmw.jpg', answer: 'bmw' },
@@ -8,63 +9,96 @@ const carBrands = [
 
 let currentStage = 1;
 let currentCar = null;
+let isProcessing = false;
+
+// Предзагрузка изображений
+const preloadedImages = [];
+carBrands.forEach(brand => {
+    const img = new Image();
+    img.src = `../Assets/Images/level1/${brand.image}`;
+    preloadedImages.push(img);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Инициализация
+    if (!localStorage.getItem('username')) {
+        window.location.href = '../index.html';
+        return;
+    }
+
     document.getElementById('username').textContent = localStorage.getItem('username');
     loadNewQuestion();
     setupEventListeners();
+    updateUI();
 });
 
 function loadNewQuestion() {
     currentCar = carBrands[Math.floor(Math.random() * carBrands.length)];
-    document.getElementById('car-image').src = `../Assets/Images/level1/${currentCar.image}`;
+    document.getElementById('car-image').src = preloadedImages.find(
+        img => img.src.endsWith(currentCar.image)
+    ).src;
     document.getElementById('answer-input').value = '';
+    document.getElementById('answer-input').focus();
+    isProcessing = false;
 }
 
 function setupEventListeners() {
     document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('username');
+        localStorage.clear();
         window.location.href = '../index.html';
     });
 
-    document.getElementById('action-btn').addEventListener('click', checkAnswer);
-    document.getElementById('answer-input').addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') checkAnswer();
+    document.getElementById('action-btn').addEventListener('click', async () => {
+        if (!isProcessing) await checkAnswer();
+    });
+
+    document.getElementById('answer-input').addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter' && !isProcessing) await checkAnswer();
     });
 }
 
-function checkAnswer() {
+async function checkAnswer() {
+    isProcessing = true;
     const userAnswer = document.getElementById('answer-input').value.trim().toLowerCase();
     const isCorrect = userAnswer === currentCar.answer;
-    
-    if(isCorrect) {
-        updateScore(1, 10);
-        currentStage++;
-        alert('Правильно! +10 баллов');
+
+    updateLevelStats(isCorrect ? 10 : -5, 1);
+    currentStage++;
+
+    showFeedback(isCorrect);
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Задержка для отображения фидбека
+
+    if (currentStage <= 3) {
+        loadNewQuestion();
     } else {
-        updateScore(1, -5);
-        alert(`Неверно! -5 баллов. Правильный ответ: ${currentCar.answer}`);
+        completeLevel(1);
+        if (getCurrentStats().completedLevels === 3) {
+            updateRating(localStorage.getItem('username'), getTotalScore());
+        }
+        window.location.href = getCurrentStats().completedLevels >= 3 
+            ? '../index.html' 
+            : '../Pages/level2.html';
     }
     
     updateUI();
-    
-    if(currentStage <= 3) {
-        loadNewQuestion();
-    } else {
-        finishLevel();
-    }
+}
+
+function showFeedback(isCorrect) {
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = isCorrect 
+        ? 'Правильно! +10 баллов' 
+        : `Неверно! -5 баллов. Правильный ответ: ${currentCar.answer}`;
+    feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
 }
 
 function updateUI() {
     const stats = getCurrentStats();
-    document.getElementById('current-score').textContent = stats.scores[1];
+    document.getElementById('current-score').textContent = stats.scores[1] || 0;
+    if (currentStage <= 3) {
+        document.getElementById('progress').textContent = `${currentStage}/3`;
+    }
 }
 
-function finishLevel() {
+function getTotalScore() {
     const stats = getCurrentStats();
-    stats.completed = true;
-    localStorage.setItem(localStorage.getItem('username'), JSON.stringify(stats));
-    alert(`Уровень завершен! Ваш счет: ${stats.scores[1]}`);
-    window.location.href = 'index.html';
+    return Object.values(stats.scores).reduce((a, b) => a + b, 0);
 }
