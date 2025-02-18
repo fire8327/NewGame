@@ -61,22 +61,26 @@ async function checkAnswer() {
     const userAnswer = document.getElementById('answer-input').value.trim().toLowerCase();
     const isCorrect = userAnswer === currentCar.answer;
 
-    updateLevelStats(isCorrect ? 10 : -5, 1);
-    currentStage++;
+    // Обновляем баллы с проверкой на отрицательные значения
+    const currentScore = getCurrentStats().scores[1] || 0;
+    const newScore = Math.max(currentScore + (isCorrect ? 10 : -5), 0);
+    updateLevelStats(newScore - currentScore, 1);
 
     showFeedback(isCorrect);
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Задержка для отображения фидбека
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
+    currentStage++;
+    
     if (currentStage <= 3) {
         loadNewQuestion();
     } else {
         completeLevel(1);
-        if (getCurrentStats().completedLevels === 3) {
-            updateRating(localStorage.getItem('username'), getTotalScore());
+        const stats = getCurrentStats();
+        if(stats.completedLevels === 3) {
+            updateRating(localStorage.getItem('username'), 
+                Object.values(stats.scores).reduce((a, b) => a + b, 0));
         }
-        window.location.href = getCurrentStats().completedLevels >= 3 
-            ? '../index.html' 
-            : '../Pages/level2.html';
+        window.location.href = '../Pages/level2.html';
     }
     
     updateUI();
@@ -87,18 +91,18 @@ function showFeedback(isCorrect) {
     feedback.textContent = isCorrect 
         ? 'Правильно! +10 баллов' 
         : `Неверно! -5 баллов. Правильный ответ: ${currentCar.answer}`;
-    feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+    feedback.className = `text-center px-4 py-2 rounded-lg transition-opacity ${
+        isCorrect ? 'text-green-500' : 'text-red-500'
+    }`;
+    setTimeout(() => {
+        feedback.className = 'opacity-0';
+    }, 1500);
 }
 
 function updateUI() {
     const stats = getCurrentStats();
     document.getElementById('current-score').textContent = stats.scores[1] || 0;
-    if (currentStage <= 3) {
+    if(currentStage <= 3 ) {
         document.getElementById('progress').textContent = `${currentStage}/3`;
     }
-}
-
-function getTotalScore() {
-    const stats = getCurrentStats();
-    return Object.values(stats.scores).reduce((a, b) => a + b, 0);
 }
