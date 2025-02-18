@@ -17,16 +17,17 @@
         </div>
     </header>
    
-    <main class="flex flex-col items-center justify-center grow text-center mx-auto gap-6 w-1/3 font-medium">
+    <main class="flex flex-col items-center justify-center grow text-center mx-auto gap-6 w-1/2 font-medium">
         <p class="text-xl">Уровень 2</p>
-        <p class="text-gray-400 mb-4">Угадайте марку автомобиля</p>
-        <img id="car-image" class="w-full h-64 object-contain bg-[#404045] rounded-xl" alt="Марка автомобиля">
-        <input id="answer-input" type="text" placeholder="Введите марку"
-            class="w-full px-4 py-2 bg-[#404045] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D6BFE] transition-all duration-500"
-            autocomplete="off" required>
+        <p class="text-gray-400">Найдите автомобиль марки: <span id="target-brand" class="text-[#4D6BFE]"></span></p>
+        
+        <div id="cars-grid" class="grid grid-cols-4 gap-4">
+            <!-- Автомобили будут добавлены через JS -->
+        </div>
 
-            <div id="feedback" class="feedback"></div>
-            <div class="progress">Прогресс: <span id="progress">1/3</span></div>
+        <div id="feedback" class="feedback"></div>
+        <div class="progress">Прогресс: <span id="progress">1/3</span></div>
+        <p class="text-gray-400">Время: <span id="timer" class="text-[#4D6BFE]"></span></p>
     </main>
 
     <footer class="w-full bg-[#212327] border-t border-white mt-auto p-4">
@@ -44,6 +45,6 @@
         </div>
     </footer>
 
-    <script type="module" src="../Assets/JS/level1.js"></script>
+    <script type="module" src="../Assets/JS/level2.js"></script>
 </body>
 </html>

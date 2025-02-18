@@ -80,7 +80,7 @@ async function checkAnswer() {
             updateRating(localStorage.getItem('username'), 
                 Object.values(stats.scores).reduce((a, b) => a + b, 0));
         }
-        window.location.href = '../Pages/level2.html';
+        window.location.href = 'level2.html';
     }
     
     updateUI();
