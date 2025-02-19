@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Топ игроков</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#292a2d] min-h-screen flex flex-col text-white">   
+    <main class="flex flex-col items-center justify-center grow text-center mx-auto gap-6 w-1/2 font-medium">
+        <p class="text-xl">Топ игроков</p>
+        <div id="rating-list" class="flex flex-col gap-4 w-full">
+            <!-- Рейтинг будет загружен здесь -->
+        </div>
+        <a href="../index.html" class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
+            В главное меню
+        </a>
+    </main>
+
+    <script>
+        function loadRating() {
+                const rating = JSON.parse(localStorage.getItem('rating')) || [];
+                const sortedRating = rating.sort((a, b) => b.score - a.score);
+                const container = document.getElementById('rating-list');
+
+                if (sortedRating.length === 0) {
+                    container.innerHTML = `<div class="text-gray-400 text-center">Рейтинг пока пуст</div>`;
+                    return;
+                }
+
+                container.innerHTML = sortedRating.map((player, index) => `
+        <div class="flex items-center gap-6 bg-[#212327] justify-between p-3 rounded-xl">
+            <div class="flex items-center gap-3">
+                <span class="text-[#4D6BFE] w-6">${index + 1}.</span>
+                <span class="text-white">Игрок: ${player.username}</span>
+            </div>
+            <span class="bg-[#4D6BFE] px-3 py-1.5 rounded-full">${player.score}</span>
+        </div>
+    `).join('');
+            }
+
+            document.addEventListener('DOMContentLoaded', loadRating);
+    </script>
+</body>
+</html>
