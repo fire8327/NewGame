@@ -4,7 +4,11 @@ const carBrands = [
     { image: 'audi.jpg', answer: 'audi' },
     { image: 'bmw.jpg', answer: 'bmw' },
     { image: 'mercedes.jpg', answer: 'mercedes' },
-    { image: 'toyota.jpg', answer: 'toyota' }
+    { image: 'toyota.jpg', answer: 'toyota' },
+    { image: 'tesla.jpg', answer: 'tesla' },
+    { image: 'opel.jpg', answer: 'opel' },
+    { image: 'honda.jpg', answer: 'honda' },
+    { image: 'nissan.jpg', answer: 'nissan' }
 ];
 
 let currentStage = 1;
@@ -20,7 +24,7 @@ const initializePreload = async () => {
         preloadedImages = await Promise.all(
             carBrands.map(async brand => {
                 const img = new Image();
-                img.src = `../Assets/Images/level2/${brand.image}`;
+                img.src = `../Assets/Images/level1-2/${brand.image}`;
                 await new Promise((resolve) => {
                     img.onload = resolve;
                     img.onerror = resolve; // Продолжаем даже при ошибке
@@ -61,7 +65,7 @@ async function startNewStage() {
     document.getElementById('target-brand').textContent = targetBrand;
     
     const cars = generateCarSet();
-    if (cars.length === 4) {
+    if (cars.length === 8) {
         await renderCars(cars);
     } else {
         alert('Ошибка генерации автомобилей!');
@@ -75,7 +79,7 @@ function generateCarSet() {
     const wrongCars = preloadedImages
         .filter(img => img.answer !== targetBrand)
         .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
+        .slice(0, 7);
 
     return [...wrongCars, correctCar].sort(() => Math.random() - 0.5);
 }

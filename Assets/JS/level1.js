@@ -4,7 +4,11 @@ const carBrands = [
     { image: 'audi.jpg', answer: 'audi' },
     { image: 'bmw.jpg', answer: 'bmw' },
     { image: 'mercedes.jpg', answer: 'mercedes' },
-    { image: 'toyota.jpg', answer: 'toyota' }
+    { image: 'toyota.jpg', answer: 'toyota' },
+    { image: 'tesla.jpg', answer: 'tesla' },
+    { image: 'opel.jpg', answer: 'opel' },
+    { image: 'honda.jpg', answer: 'honda' },
+    { image: 'nissan.jpg', answer: 'nissan' }
 ];
 
 let currentStage = 1;
@@ -15,7 +19,7 @@ let isProcessing = false;
 const preloadedImages = [];
 carBrands.forEach(brand => {
     const img = new Image();
-    img.src = `../Assets/Images/level1/${brand.image}`;
+    img.src = `../Assets/Images/level1-2/${brand.image}`;
     preloadedImages.push(img);
 });
 
