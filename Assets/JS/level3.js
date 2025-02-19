@@ -39,7 +39,7 @@ function initGame() {
         card.dataset.brand = brand.key;
         
         const title = document.createElement('div');
-        title.className = 'text-xl font-bold text-blue-400 mb-2';
+        title.className = 'text-xl font-bold text-[#4D6BFE] mb-2';
         title.textContent = brand.name;
         
         const dropZone = document.createElement('div');
@@ -99,19 +99,19 @@ function handleDragEnd(e) {
 /* обработчик наведения на зону сброса */
 function handleDragOver(e) {
     e.preventDefault();
-    e.currentTarget.classList.add('border-blue-500');
+    e.currentTarget.classList.add('border-[#4D6BFE]');
 }
 
 /* обработчик ухода из зоны сброса */
 function handleDragLeave(e) {
-    e.currentTarget.classList.remove('border-blue-500');
+    e.currentTarget.classList.remove('border-[#4D6BFE]');
 }
 
 /* обработчик сброса элемента в зону бренда */
 function handleDrop(e) {
     e.preventDefault();
     const brandCard = e.currentTarget;
-    brandCard.classList.remove('border-blue-500');
+    brandCard.classList.remove('border-[#4D6BFE]');
     
     if(!draggedItem || secondsLeft <= 0) return;
     
