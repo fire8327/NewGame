@@ -77,7 +77,7 @@ async function checkAnswer() {
     updateLevelStats(newScore - currentScore, 1);
 
     showFeedback(isCorrect); // отображение сообщения о результате
-    await new Promise(resolve => setTimeout(resolve, 1500)); // задержка перед продолжением
+    await new Promise(resolve => setTimeout(resolve, 3000)); // задержка перед продолжением
 
     currentStage++; // увеличение стадии
     
@@ -107,7 +107,7 @@ function showFeedback(isCorrect) {
     }`; // изменение стиля текста
     setTimeout(() => {
         feedback.className = 'opacity-0'; // скрытие сообщения через 1.5 секунды
-    }, 1500);
+    }, 3000);
 }
 
 /* обновление пользовательского интерфейса */
