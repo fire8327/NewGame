@@ -217,12 +217,7 @@ function finishLevel(timeout = false) {
         alert('Время вышло! Возвращаемся в меню');
         window.location.href = '../index.html';
     } else {
-        // получаем обновленную статистику после завершения уровня
-        const stats = getCurrentStats();
-        
-        // если игрок прошел три уровня, отправляем его в меню, иначе на следующий уровень
-        const nextLevel = stats.completedLevels >= 3 ? '../index.html' : 'level3.html';
-        window.location.href = nextLevel;
+        window.location.href = 'level3.html';
     }
 }
 

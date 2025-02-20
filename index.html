@@ -6,17 +6,61 @@
     <title>Главная</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-[#292a2d] min-h-screen flex items-center justify-center text-white">
-    <form id="login-form" class="flex flex-col items-center gap-8 w-1/3 font-medium">
-        <p class="text-2xl">Форма входа</p>
-        <input id="login-input" type="text" placeholder="Введите логин"
-            class="w-full px-4 py-2 bg-[#404045] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D6BFE] transition-all duration-500"
-            autocomplete="off" required>
-        <button type="submit" id="login-btn"
+<body class="bg-[#292a2d] min-h-screen flex flex-col text-white">
+    <header id="user-info" class="w-full bg-[#212327] p-4 hidden">
+        <div class="container mx-auto flex items-center justify-between font-medium">
+            <p class="text-xl">Игрок: <span id="username" class="text-[#4D6BFE]"></span></p>
+            <button type="submit" id="logout-btn"
+                class="bg-red-500 py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
+                Выйти
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full flex flex-col items-center justify-center grow gap-8 container mx-auto my-10">
+        <button id="open-login-modal"
             class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
             Начать игру
         </button>
-    </form>   
+    
+        <div id="level-select" class="w-1/3 font-medium hidden">
+            <div class="w-full flex flex-col items-center gap-8">
+                <p class="text-2xl">Выберите уровень</p>        
+                <button id="level1-btn"
+                    class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-36 text-center hover:opacity-80 transition-all duration-500 cursor-pointer">
+                    Уровень 1
+                </a>
+                <button id="level2-btn"
+                    class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-36 text-center hover:opacity-80 transition-all duration-500 cursor-pointer">
+                    Уровень 2
+                </button>
+                <button id="level3-btn"
+                    class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-36 text-center hover:opacity-80 transition-all duration-500 cursor-pointer">
+                    Уровень 3
+                </button>
+                <a href="Pages/rating.html"
+                    class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-36 text-center hover:opacity-80 transition-all duration-500 cursor-pointer">
+                    Результаты
+                </a>
+            </div>
+        </div>
+    
+        <div id="login-modal" class="fixed inset-0 bg-white/10 hidden">
+            <div class="w-full h-full flex items-center justify-center">
+                <form id="login-form" class="flex flex-col items-center gap-8 w-1/3 font-medium bg-[#2c2c32] p-8 rounded-lg">
+                    <p class="text-2xl">Форма входа</p>
+                    <input id="login-input" type="text" placeholder="Введите логин"
+                        class="w-full px-4 py-2 bg-[#404045] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D6BFE] transition-all duration-500"
+                        autocomplete="off" required>
+                    <button type="submit" id="login-btn"
+                        class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
+                        Начать игру
+                    </button>
+                </form>
+            </div>
+        </div> 
+    </main>
+
     
     <script type="module" src="Assets/JS/auth.js"></script>
 </body>
