@@ -17,16 +17,16 @@
         </div>
     </header>
    
-    <main class="flex flex-col items-center justify-center grow text-center mx-auto gap-6 w-1/2 font-medium">
+    <main class="flex flex-col items-center justify-center grow text-center container mx-auto gap-6 w-full font-medium">
         <p class="text-xl">Уровень 3</p>
         <p class="text-gray-400">Сопоставление брендов</p>
         <p class="text-gray-400">Время: <span id="timer" class="text-[#4D6BFE]"></span></p>
         
         <!-- Бренды -->
-        <div class="grid grid-cols-4 gap-4" id="brands-container"></div>
+        <div class="grid grid-cols-4 gap-4 w-1/2" id="brands-container"></div>
         
         <!-- Автомобили -->
-        <div class="grid grid-cols-4 gap-4" id="cars-container"></div>        
+        <div class="grid grid-cols-5 gap-4 w-full" id="cars-container"></div>        
     </main>
 
     <footer class="w-full bg-[#212327] border-t border-white mt-auto p-4">
@@ -36,6 +36,10 @@
                 <a href="../index.html" class="bg-red-500 py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
                     Закончить игру
                 </a>
+                <button id="add-time-btn" type="submit" id="action-btn"
+                    class="bg-amber-500 py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
+                    Добавить 10 секунд
+                </button>
                 <button id="show-results" type="submit" id="action-btn"
                     class="bg-[#4D6BFE] py-1.5 px-4 rounded-lg w-fit hover:opacity-80 transition-all duration-500 cursor-pointer">
                     Перейти к результатам
