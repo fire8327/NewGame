@@ -20,43 +20,24 @@ let correctCarId = null; // индекс правильного автомоби
 let secondsLeft = 40; // оставшееся время на уровень
 let timerInterval = null; // идентификатор интервала таймера
 let preloadedImages = []; // массив предзагруженных изображений автомобилей
-
-
-// Добавляем переменную в глобальную область
-let highlightInterval = null;
-
-// Функция выделения случайной картинки
-function highlightRandomCar() {
-    const grid = document.getElementById('cars-grid');
-    const cards = grid.querySelectorAll('.group');
-
-    if (cards.length > 0) {
-        const randomIndex = Math.floor(Math.random() * cards.length);
-        const randomCard = cards[randomIndex];
-
-        randomCard.classList.add('border-white');
-        setTimeout(() => {
-            randomCard.classList.remove('border-white');
-        }, 1500);
-    }
-}
-
+let shuffleInterval = null; // интервал для перемешивания карточек
+let visibilityInterval = null; // интервал для скрытия/показа карточек
 
 /* функция предзагрузки изображений автомобилей */
 const initializePreload = async () => {
-    try { // асинхронно загружает изображения. 
+    try {
         preloadedImages = await Promise.all(
             carBrands.map(async brand => {
                 const img = new Image();
                 img.src = `../Assets/Images/level1-2/${brand.image}`;
                 await new Promise((resolve) => {
                     img.onload = resolve;
-                    img.onerror = resolve; // при ошибке загрузки продолжаем
+                    img.onerror = resolve;
                 });
                 return { ...brand, element: img };
             })
         );
-    } catch (error) { // в случае ошибки использует заглушку
+    } catch (error) {
         console.error('Ошибка предзагрузки:', error);
         preloadedImages = carBrands.map(brand => ({
             ...brand,
@@ -67,33 +48,38 @@ const initializePreload = async () => {
 
 /* запуск игры после загрузки страницы */
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!localStorage.getItem('username')) { // проверяет, авторизован ли пользователь
+    if (!localStorage.getItem('username')) {
         window.location.href = '../index.html';
         return;
     }
 
-    try { 
-        // инициализирует загрузку изображений
+    try {
         await initializePreload();
         document.getElementById('username').textContent = localStorage.getItem('username');
-        //Запускает новый этап и таймер
         await startNewStage();
         startTimer();
-        highlightInterval = setInterval(highlightRandomCar, 5000);
+        shuffleInterval = setInterval(shuffleCars, 3000); // Перемешивание каждые 3 секунды
+        visibilityInterval = setInterval(toggleVisibility, 3000); // Скрытие/показ каждые 3 секунды
         updateUI();
     } catch (error) {
         console.error('Ошибка инициализации:', error);
         alert('Ошибка загрузки уровня!');
     }
+
+    // Обработчик для кнопки добавления 10 секунд
+    document.getElementById('add-time-btn').addEventListener('click', () => {
+        secondsLeft += 10;
+        document.getElementById('timer').textContent = secondsLeft;
+    });
 });
 
 /* начало нового этапа */
 async function startNewStage() {
-    const randomBrand = carBrands[Math.floor(Math.random() * carBrands.length)]; // выбирает случайную марку, которую нужно найти
+    const randomBrand = carBrands[Math.floor(Math.random() * carBrands.length)];
     targetBrand = randomBrand.answer;
     document.getElementById('target-brand').textContent = targetBrand;
     
-    const cars = generateCarSet(); // генерирует набор машин для выбора и отображает их на экране
+    const cars = generateCarSet();
     if (cars.length === 8) {
         await renderCars(cars);
     } else {
@@ -109,9 +95,9 @@ function generateCarSet() {
     const wrongCars = preloadedImages
         .filter(img => img.answer !== targetBrand)
         .sort(() => Math.random() - 0.5)
-        .slice(0, 7); // включает 1 правильный вариант и 7 случайных неправильных
+        .slice(0, 7);
 
-    return [...wrongCars, correctCar].sort(() => Math.random() - 0.5); // перемешивает массив перед отображением
+    return [...wrongCars, correctCar].sort(() => Math.random() - 0.5);
 }
 
 /* отображение машин на экране */
@@ -123,10 +109,8 @@ async function renderCars(cars) {
     cars.forEach((car, index) => {
         if (car.answer === targetBrand) correctCarId = index;
 
-        // создает карточки с изображениями автомобилей
-
         const card = document.createElement('div');
-        card.className = 'relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-xl hover:scale-105 border-2 border-transparent';
+        card.className = 'relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-xl hover:scale-105 duration-500';
         
         const img = document.createElement('img');
         img.className = 'w-full object-cover rounded-xl aspect-video opacity-80';
@@ -138,7 +122,7 @@ async function renderCars(cars) {
         };
 
         card.appendChild(img);
-        card.addEventListener('click', () => handleCarClick(card, index)); // добавляет обработчик клика
+        card.addEventListener('click', () => handleCarClick(card, index));
         grid.appendChild(card);
     });
 
@@ -147,22 +131,22 @@ async function renderCars(cars) {
 
 /* проверка ответа */
 function handleCarClick(card, index) {
-    if(isProcessing || !secondsLeft) return;
+    if (isProcessing || !secondsLeft) return;
     isProcessing = true;
 
     const isCorrect = index === correctCarId;
     const stats = getCurrentStats();
-    const newScore = Math.max(stats.scores[2] + (isCorrect ? 15 : -10), 0); // если ответ правильный, начисляются баллы
+    const newScore = Math.max(stats.scores[2] + (isCorrect ? 15 : -10), 0);
     updateLevelStats(newScore - stats.scores[2], 2);
 
     showFeedback(card, isCorrect);
     currentStage++;
 
     setTimeout(() => {
-        if(currentStage <= 3 && secondsLeft > 0) {
+        if (currentStage <= 3 && secondsLeft > 0) {
             startNewStage();
         } else {
-            finishLevel(); // после 3 этапов уровень завершается
+            finishLevel();
         }
         updateUI();
         isProcessing = false;
@@ -171,71 +155,53 @@ function handleCarClick(card, index) {
 
 /* функция фидбека */
 function showFeedback(card, isCorrect) {
-    // удаляем предыдущие стили, если они были добавлены ранее
     card.classList.remove('border-green-500', 'border-red-500', 'border-2');
-    
-    // добавляем рамку соответствующего цвета в зависимости от правильности ответа
     card.classList.add('border-2', isCorrect ? 'border-green-500' : 'border-red-500');
     
-    // создаем элемент для отображения числового значения очков
     const feedback = document.createElement('div');
     feedback.className = 'absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm font-semibold ' + 
                         (isCorrect ? 'text-green-500' : 'text-red-500');
-    
-    // отображаем +15 очков за правильный ответ и -10 за ошибку
     feedback.textContent = isCorrect ? '+15' : '-10';
     
-    // добавляем созданный элемент внутрь карточки
     card.appendChild(feedback);
     
-    // через 1.5 секунды удаляем обратную связь и сбрасываем стили
     setTimeout(() => {
-        feedback.remove(); // удаляем текстовый элемент с очками
-        card.classList.remove('border-2', 'border-green-500', 'border-red-500'); // сбрасываем стили рамки
+        feedback.remove();
+        card.classList.remove('border-2', 'border-green-500', 'border-red-500');
     }, 1500);
 }
 
 /* запуск таймера */
 function startTimer() {
-    // запускаем таймер, который каждую секунду уменьшает количество оставшегося времени
     timerInterval = setInterval(() => {
-        secondsLeft--; // уменьшаем оставшиеся секунды
-        document.getElementById('timer').textContent = secondsLeft; // обновляем UI таймера
+        secondsLeft--;
+        document.getElementById('timer').textContent = secondsLeft;
         
-        // если время закончилось, останавливаем таймер и завершаем уровень
-        if(secondsLeft <= 0) {
+        if (secondsLeft <= 0) {
             clearInterval(timerInterval);
-            finishLevel(true); // передаем параметр true, чтобы обозначить окончание из-за таймера
+            finishLevel(true);
         }
     }, 1000);
 }
 
 /* обновление интерфейса */
 function updateUI() {
-    // получаем текущую статистику игрока
     const stats = getCurrentStats();
-    
-    // обновляем текущий счет в интерфейсе
     document.getElementById('current-score').textContent = stats.scores[2];
-    
-    // если уровень еще идет, обновляем прогресс
-    if(currentStage <= 3 ) {
+    if (currentStage <= 3) {
         document.getElementById('progress').textContent = `${currentStage}/3`;
     }
 }
 
-
 /* окончание уровня */
 function finishLevel(timeout = false) {
-    // останавливаем таймер, так как уровень завершается
     clearInterval(timerInterval);
-    clearInterval(highlightInterval);
+    clearInterval(shuffleInterval);
+    clearInterval(visibilityInterval);
     
-    // отмечаем уровень как завершенный
     completeLevel(2);
     
-    if(timeout) {
-        // если уровень завершился из-за истечения времени, уведомляем игрока и возвращаем в меню
+    if (timeout) {
         alert('Время вышло! Возвращаемся в меню');
         window.location.href = '../index.html';
     } else {
@@ -245,8 +211,46 @@ function finishLevel(timeout = false) {
 
 /* обработчик выхода из аккаунта */
 document.getElementById('logout-btn').addEventListener('click', () => {
-    clearInterval(timerInterval); // останавливаем таймер при выходе
-    clearInterval(highlightInterval);
-    localStorage.removeItem('username'); // удаляем имя пользователя из локального хранилища
-    window.location.href = '../index.html'; // перенаправляем на главную страницу
+    clearInterval(timerInterval);
+    clearInterval(shuffleInterval);
+    clearInterval(visibilityInterval);
+    localStorage.removeItem('username');
+    window.location.href = '../index.html';
 });
+
+/* перемешивание карточек */
+function shuffleCars() {
+    const grid = document.getElementById('cars-grid');
+    const cards = Array.from(grid.children);
+    cards.sort(() => Math.random() - 0.5);
+    grid.innerHTML = '';
+    cards.forEach(card => grid.appendChild(card));
+}
+
+/* скрытие и показ карточек с плавностью */
+function toggleVisibility() {
+    const grid = document.getElementById('cars-grid');
+    const cards = Array.from(grid.children);
+    
+    // Очищаем предыдущие классы opacity-0, чтобы избежать накопления
+    cards.forEach(card => card.classList.remove('opacity-0'));
+
+    // Выбираем две случайные карточки для скрытия
+    const indicesToHide = [];
+    while (indicesToHide.length < 2) {
+        const randomIndex = Math.floor(Math.random() * cards.length);
+        if (!indicesToHide.includes(randomIndex)) indicesToHide.push(randomIndex);
+    }
+    
+    // Скрываем выбранные карточки
+    indicesToHide.forEach(index => {
+        cards[index].classList.add('opacity-0');
+    });
+    
+    // Показываем их обратно через 1.5 секунды
+    setTimeout(() => {
+        indicesToHide.forEach(index => {
+            cards[index].classList.remove('opacity-0');
+        });
+    }, 1500);
+}
