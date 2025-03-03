@@ -22,6 +22,26 @@ let timerInterval = null; // идентификатор интервала та�
 let preloadedImages = []; // массив предзагруженных изображений автомобилей
 
 
+// Добавляем переменную в глобальную область
+let highlightInterval = null;
+
+// Функция выделения случайной картинки
+function highlightRandomCar() {
+    const grid = document.getElementById('cars-grid');
+    const cards = grid.querySelectorAll('.group');
+
+    if (cards.length > 0) {
+        const randomIndex = Math.floor(Math.random() * cards.length);
+        const randomCard = cards[randomIndex];
+
+        randomCard.classList.add('border-white');
+        setTimeout(() => {
+            randomCard.classList.remove('border-white');
+        }, 1500);
+    }
+}
+
+
 /* функция предзагрузки изображений автомобилей */
 const initializePreload = async () => {
     try { // асинхронно загружает изображения. 
@@ -59,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         //Запускает новый этап и таймер
         await startNewStage();
         startTimer();
+        highlightInterval = setInterval(highlightRandomCar, 5000);
         updateUI();
     } catch (error) {
         console.error('Ошибка инициализации:', error);
@@ -105,7 +126,7 @@ async function renderCars(cars) {
         // создает карточки с изображениями автомобилей
 
         const card = document.createElement('div');
-        card.className = 'relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105';
+        card.className = 'relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-xl hover:scale-105 border-2 border-transparent';
         
         const img = document.createElement('img');
         img.className = 'w-full object-cover rounded-xl aspect-video opacity-80';
@@ -208,6 +229,7 @@ function updateUI() {
 function finishLevel(timeout = false) {
     // останавливаем таймер, так как уровень завершается
     clearInterval(timerInterval);
+    clearInterval(highlightInterval);
     
     // отмечаем уровень как завершенный
     completeLevel(2);
@@ -224,6 +246,7 @@ function finishLevel(timeout = false) {
 /* обработчик выхода из аккаунта */
 document.getElementById('logout-btn').addEventListener('click', () => {
     clearInterval(timerInterval); // останавливаем таймер при выходе
+    clearInterval(highlightInterval);
     localStorage.removeItem('username'); // удаляем имя пользователя из локального хранилища
     window.location.href = '../index.html'; // перенаправляем на главную страницу
 });
