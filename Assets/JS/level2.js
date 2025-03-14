@@ -1,5 +1,3 @@
-import { getCurrentStats, updateLevelStats, completeLevel, updateRating } from './stats.js';
-
 /* создание массива машин и правильных ответов */
 const carBrands = [
     { image: 'audi.jpg', answer: 'audi' },

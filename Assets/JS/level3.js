@@ -1,5 +1,3 @@
-import { getCurrentStats, updateLevelStats, completeLevel, updateRating } from './stats.js';
-
 // Определяем список брендов (4 бренда сверху)
 const brands = [
     { name: 'Audi', key: 'audi', image: 'audi.jpg' },
